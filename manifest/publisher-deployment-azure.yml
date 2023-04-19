@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: publisher
+  labels:
+    app: publisher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: publisher
+  template:
+    metadata:
+      labels:
+        app: publisher
+    spec:
+      containers:
+      - name: publisher
+        image: az4registry.azurecr.io/producer:latest
+        ports:
+        - containerPort: 80
+        imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+      - name: acr-secret
+---
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: publisher
+  labels:
+    app: publisher
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: publisher
+  type: LoadBalancer

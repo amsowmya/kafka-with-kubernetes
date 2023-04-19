@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscriber
+  labels:
+    app: subscriber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subscriber
+  template:
+    metadata:
+      labels:
+        app: subscriber
+    spec:
+      containers:
+      - name: subscriber
+        image: az4registry.azurecr.io/consumer:latest
+        ports:
+        - containerPort: 80
+        imagePullPolicy: IfNotPresent
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subscriber
+  labels:
+    app: subscriber
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: subscriber
+  type: LoadBalancer
